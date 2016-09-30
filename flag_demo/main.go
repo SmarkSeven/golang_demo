@@ -20,7 +20,13 @@ func init() {
 
 func main() {
 	// 打印帮助文档
-	flag.PrintDefaults()
+	// flag.PrintDefaults()
+
+	// 自定义帮助文档
+	flag.VisitAll(func(flag *flag.Flag) {
+		format := "\t-%s: %s (Default: '%s')\n"
+		fmt.Printf(format, flag.Name, flag.Usage, flag.DefValue)
+	})
 	// 解析实际值到flag变量
 	flag.Parse()
 	if spanish == true {

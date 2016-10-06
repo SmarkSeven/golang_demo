@@ -10,17 +10,34 @@ import (
 
 func main() {
 	var wg sync.WaitGroup
-	i := -1
+	counter := &count{}
 	var file string
-	for i, file = range os.Args[1:] {
+	for _, file = range os.Args[1:] {
 		wg.Add(1)
 		go func(filename string) {
-			compress(filename)
+			println(filename)
+			if err := compress(filename); err == nil {
+				counter.Increment()
+			}
 			wg.Done()
 		}(file)
 	}
 	wg.Wait()
-	fmt.Printf("Compressed %d files\n", i+1)
+	fmt.Printf("Compressed %d files\n", counter.Sum())
+}
+
+type count struct {
+	sync.Mutex
+	num int
+}
+
+func (c *count) Increment() {
+	c.Lock()
+	c.num++
+	c.Unlock()
+}
+func (c *count) Sum() int {
+	return c.num
 }
 
 func compress(filename string) error {
